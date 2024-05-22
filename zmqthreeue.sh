@@ -2,9 +2,9 @@
 
 SLEEPINT=5;
 
-export SS_XAPP=`kubectl get svc -n ricxapp --field-selector metadata.name=service-ricxapp-drl-ss-rmr -o jsonpath='{.items[0].spec.clusterIP}'`
+export SS_XAPP=`kubectl get svc -n ricxapp --field-selector metadata.name=service-ricxapp-ss-rmr -o jsonpath='{.items[0].spec.clusterIP}'`
 if [ -z "$SS_XAPP" ]; then
-    export SS_XAPP=`kubectl get svc -n ricxapp --field-selector metadata.name=service-ricxapp-drl-ss-rmr -o jsonpath='{.items[0].spec.clusterIP}'`
+    export SS_XAPP=`kubectl get svc -n ricxapp --field-selector metadata.name=service-ricxapp-ss-rmr -o jsonpath='{.items[0].spec.clusterIP}'`
 fi
 if [ -z "$SS_XAPP" ]; then
     echo "ERROR: failed to find drl-ss nbi service; aborting!"
