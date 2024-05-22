@@ -72,12 +72,16 @@ class multi_ue(gr.top_block, Qt.QWidget):
         self.samp_rate = samp_rate = 23.04e6
         self.min_gain = min_gain = 0
         self.max_gain = max_gain = 1
+        self.cell_gain2 = cell_gain2 = 0.050
         self.cell_gain1 = cell_gain1 = 0.080
         self.cell_gain0 = cell_gain0 = 0.050
 
         ##################################################
         # Blocks
         ##################################################
+        self._cell_gain2_range = Range(min_gain, max_gain, 0.0001, 0.050, 200)
+        self._cell_gain2_win = RangeWidget(self._cell_gain2_range, self.set_cell_gain2, 'cell_gain2', "counter_slider", float)
+        self.top_grid_layout.addWidget(self._cell_gain2_win)
         self._cell_gain1_range = Range(min_gain, max_gain, 0.0001, 0.080, 200)
         self._cell_gain1_win = RangeWidget(self._cell_gain1_range, self.set_cell_gain1, 'cell_gain1', "counter_slider", float)
         self.top_grid_layout.addWidget(self._cell_gain1_win)
@@ -85,14 +89,18 @@ class multi_ue(gr.top_block, Qt.QWidget):
         self._cell_gain0_win = RangeWidget(self._cell_gain0_range, self.set_cell_gain0, 'cell_gain0', "counter_slider", float)
         self.top_grid_layout.addWidget(self._cell_gain0_win)
         self.zeromq_req_source_1 = zeromq.req_source(gr.sizeof_gr_complex, 1, 'tcp://localhost:2000', 100, False, -1)
+        self.zeromq_req_source_0_0_0 = zeromq.req_source(gr.sizeof_gr_complex, 1, 'tcp://localhost:2008', 100, False, -1)
         self.zeromq_req_source_0_0 = zeromq.req_source(gr.sizeof_gr_complex, 1, 'tcp://localhost:2007', 100, False, -1)
         self.zeromq_req_source_0 = zeromq.req_source(gr.sizeof_gr_complex, 1, 'tcp://localhost:2010', 100, False, -1)
+        self.zeromq_rep_sink_1_1_0 = zeromq.rep_sink(gr.sizeof_gr_complex, 1, 'tcp://*:2500', 100, False, -1)
         self.zeromq_rep_sink_1_1 = zeromq.rep_sink(gr.sizeof_gr_complex, 1, 'tcp://*:2400', 100, False, -1)
         self.zeromq_rep_sink_1_0 = zeromq.rep_sink(gr.sizeof_gr_complex, 1, 'tcp://*:2300', 100, False, -1)
         self.zeromq_rep_sink_0 = zeromq.rep_sink(gr.sizeof_gr_complex, 1, 'tcp://*:2009', 100, False, -1)
         self.blocks_throttle_0_0 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate,True)
         self.blocks_throttle_0 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate,True)
+        self.blocks_multiply_const_vxx_0_1_0_0 = blocks.multiply_const_cc(cell_gain2)
         self.blocks_multiply_const_vxx_0_1_0 = blocks.multiply_const_cc(cell_gain1)
+        self.blocks_multiply_const_vxx_0_0_1 = blocks.multiply_const_cc(cell_gain2)
         self.blocks_multiply_const_vxx_0_0_0 = blocks.multiply_const_cc(cell_gain0)
         self.blocks_multiply_const_vxx_0_0 = blocks.multiply_const_cc(cell_gain1)
         self.blocks_multiply_const_vxx_0 = blocks.multiply_const_cc(cell_gain0)
@@ -107,12 +115,16 @@ class multi_ue(gr.top_block, Qt.QWidget):
         self.connect((self.blocks_multiply_const_vxx_0, 0), (self.blocks_add_xx_0, 0))
         self.connect((self.blocks_multiply_const_vxx_0_0, 0), (self.blocks_add_xx_0, 1))
         self.connect((self.blocks_multiply_const_vxx_0_0_0, 0), (self.zeromq_rep_sink_1_0, 0))
+        self.connect((self.blocks_multiply_const_vxx_0_0_1, 0), (self.blocks_add_xx_0, 2))
         self.connect((self.blocks_multiply_const_vxx_0_1_0, 0), (self.zeromq_rep_sink_1_1, 0))
+        self.connect((self.blocks_multiply_const_vxx_0_1_0_0, 0), (self.zeromq_rep_sink_1_1_0, 0))
         self.connect((self.blocks_throttle_0, 0), (self.blocks_multiply_const_vxx_0_0_0, 0))
         self.connect((self.blocks_throttle_0, 0), (self.blocks_multiply_const_vxx_0_1_0, 0))
+        self.connect((self.blocks_throttle_0, 0), (self.blocks_multiply_const_vxx_0_1_0_0, 0))
         self.connect((self.blocks_throttle_0_0, 0), (self.zeromq_rep_sink_0, 0))
         self.connect((self.zeromq_req_source_0, 0), (self.blocks_multiply_const_vxx_0, 0))
         self.connect((self.zeromq_req_source_0_0, 0), (self.blocks_multiply_const_vxx_0_0, 0))
+        self.connect((self.zeromq_req_source_0_0_0, 0), (self.blocks_multiply_const_vxx_0_0_1, 0))
         self.connect((self.zeromq_req_source_1, 0), (self.blocks_throttle_0, 0))
 
     def closeEvent(self, event):
@@ -139,6 +151,14 @@ class multi_ue(gr.top_block, Qt.QWidget):
 
     def set_max_gain(self, max_gain):
         self.max_gain = max_gain
+
+    def get_cell_gain2(self):
+        return self.cell_gain2
+
+    def set_cell_gain2(self, cell_gain2):
+        self.cell_gain2 = cell_gain2
+        self.blocks_multiply_const_vxx_0_0_1.set_k(self.cell_gain2)
+        self.blocks_multiply_const_vxx_0_1_0_0.set_k(self.cell_gain2)
 
     def get_cell_gain1(self):
         return self.cell_gain1
