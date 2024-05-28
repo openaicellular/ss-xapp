@@ -37,7 +37,7 @@ curl -i -X GET http://${SS_XAPP}:8000/v1/slices ; echo ; echo
 sleep $SLEEPINT
 
 echo "Creating Slice (name=secure_slice)": ; echo
-curl -i -X POST -H "Content-type: application/json" -d '{"name":"secure_slice","allocation_policy":{"type":"proportional","share":64}}' http://${SS_XAPP}:8000/v1/slices ; echo ; echo
+curl -i -X POST -H "Content-type: application/json" -d '{"name":"secure_slice","allocation_policy":{"type":"proportional","share":0}}' http://${SS_XAPP}:8000/v1/slices ; echo ; echo
 echo Listing Slices: ; echo
 curl -i -X GET http://${SS_XAPP}:8000/v1/slices ; echo ; echo
 
