@@ -387,7 +387,7 @@ bool App::handle(e2sm::kpm::KpmIndication *kind)
 			 slice_name.c_str(),policy->getShare(),new_share);
 	    // NB: we just compute a share factor, because that's what the
 	    // auto-equalizing code cares about.
-	    // nshare = cshare + (cshare * f)
+	    //  = cshare + (cshare * f)
 	    // n - c = c * f
 	    // (n - c) / c = f
 	    // 110 = 100 + 100 * .1
@@ -779,14 +779,16 @@ for (auto it = report->ues.begin(); it != report->ues.end(); ++it) {
 	Slice *slice = slices[slice_name];
 	ProportionalAllocationPolicy *policy = policies[slice_name];
 	int cshare = policy->getShare();
-	int nshare = std::min((int)(cshare + (cshare * it->second)),1024);
-	
+	int  = std::min((int)(cshare + (cshare * it->second)),1024);
+
+	/*
 	if (nshare < 1 || nshare < 64)
 	{
 	    //nshare = 1;
 	    nshare = 64;
 	}
-
+	*/
+	    
 	if (influxdb) {
 	    influxdb->write(influxdb::Point{"share"}
 		.addField("share", nshare)
