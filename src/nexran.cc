@@ -653,13 +653,13 @@ for (auto it = report->ues.begin(); it != report->ues.end(); ++it) {
 					
 					*/
 
-					mdclog_write(MDCLOG_DEBUG,"BINDING START");
-					//bind to malicious UE to secure slice
-					mutex.unlock();
-					bind_ue_slice(ue1imsi,slice2,&ae);
-					mutex.lock();
-					mdclog_write(MDCLOG_DEBUG,"BINDING SUCCESS");
-						//print something here telling us wht happened
+					// mdclog_write(MDCLOG_DEBUG,"BINDING START");
+					// //bind to malicious UE to secure slice
+					// mutex.unlock();
+					// bind_ue_slice(ue1imsi,slice2,&ae);
+					// mutex.lock();
+					// mdclog_write(MDCLOG_DEBUG,"BINDING SUCCESS");
+					// 	//print something here telling us wht happened
 
 				}
 				TOTAL_TX_1 = 0;
@@ -702,12 +702,12 @@ for (auto it = report->ues.begin(); it != report->ues.end(); ++it) {
 					// Slice *slice = Slice::create(d,&ae);
 
 
-					mdclog_write(MDCLOG_DEBUG,"BINDING START");
-					//bind to malicious UE to secure slice
-					mutex.unlock();
-					bind_ue_slice(ue2imsi,slice2,&ae);
-					mutex.lock();
-					mdclog_write(MDCLOG_DEBUG,"BINDING SUCCESS");
+					// mdclog_write(MDCLOG_DEBUG,"BINDING START");
+					// //bind to malicious UE to secure slice
+					// mutex.unlock();
+					// bind_ue_slice(ue2imsi,slice2,&ae);
+					// mutex.lock();
+					// mdclog_write(MDCLOG_DEBUG,"BINDING SUCCESS");
 
 					//print something here
 
@@ -753,12 +753,12 @@ for (auto it = report->ues.begin(); it != report->ues.end(); ++it) {
 					// Slice *slice = Slice::create(d,&ae);
 
 
-					mdclog_write(MDCLOG_DEBUG,"BINDING START");
-					//bind to malicious UE to secure slice
-					mutex.unlock();
-					bind_ue_slice(ue3imsi,slice2,&ae);
-					mutex.lock();
-					mdclog_write(MDCLOG_DEBUG,"BINDING SUCCESS");
+					// mdclog_write(MDCLOG_DEBUG,"BINDING START");
+					// //bind to malicious UE to secure slice
+					// mutex.unlock();
+					// bind_ue_slice(ue3imsi,slice2,&ae);
+					// mutex.lock();
+					// mdclog_write(MDCLOG_DEBUG,"BINDING SUCCESS");
 
 					//print something here
 
