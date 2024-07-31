@@ -18,12 +18,13 @@
 #include "restserver.h"
 //#include "restserver.cc"
 
+#include <curl/curl.h>
 using namespace std;
 
 int TX_PKTS=0;
-int TOTAL_TX_1=0;
-int TOTAL_TX_2=0;
-int TOTAL_TX_3=0;
+long long int TOTAL_TX_1=0;
+long long int TOTAL_TX_2=0;
+long long int TOTAL_TX_3=0;
 int COUNTER1=0;
 int COUNTER2=0;
 int COUNTER3=0;
@@ -31,6 +32,8 @@ bool malicious=0;
 bool slicecheck=0;
 int tx_threshold = 130;
 int ue_counter = 0;
+
+char url[1024];
 
 std::string slice1 = "fast";
 std::string slice2 = "secure_slice";
@@ -525,13 +528,14 @@ for (auto it = report->ues.begin(); it != report->ues.end(); ++it) {
 
 	    int ue_name = it->first;
 		mdclog_write(MDCLOG_INFO,"UE NAME '%d':",ue_name);
+		mdclog_write(MDCLOG_INFO,"UE tx_pkt '%ld'",report->ues[ue_name].tx_pkts);
 		ue_counter++;
 
 		if(ue_counter == 1) //ue_name==70
 		{
 			//total the tx pkts for ue1
 			TOTAL_TX_1 = TOTAL_TX_1+ report->ues[ue_name].tx_pkts;
-			mdclog_write(MDCLOG_INFO, "Total tx_pkts '%d': %d",
+			mdclog_write(MDCLOG_INFO, "Total tx_pkts '%d': %lld",
 			ue_name, TOTAL_TX_1);
 			COUNTER1++;
 			mdclog_write(MDCLOG_INFO,"COUNT: %d",
@@ -542,7 +546,7 @@ for (auto it = report->ues.begin(); it != report->ues.end(); ++it) {
 		else if(ue_counter == 2) 
 		{
 			TOTAL_TX_2 = TOTAL_TX_2 + report->ues[ue_name].tx_pkts;
-			mdclog_write(MDCLOG_INFO, "Total tx_pkts '%d': %d",
+			mdclog_write(MDCLOG_INFO, "Total tx_pkts '%d': %lld",
 			ue_name, TOTAL_TX_2);
 			COUNTER2++;
 			mdclog_write(MDCLOG_INFO,"COUNT: %d",
@@ -553,7 +557,7 @@ for (auto it = report->ues.begin(); it != report->ues.end(); ++it) {
 		else if(ue_counter == 3) 
 		{
 			TOTAL_TX_3 = TOTAL_TX_3 + report->ues[ue_name].tx_pkts;
-			mdclog_write(MDCLOG_INFO, "Total tx_pkts '%d': %d",
+			mdclog_write(MDCLOG_INFO, "Total tx_pkts '%d': %lld",
 			ue_name, TOTAL_TX_3);
 			COUNTER3++;
 			mdclog_write(MDCLOG_INFO,"COUNT: %d",
@@ -661,6 +665,8 @@ for (auto it = report->ues.begin(); it != report->ues.end(); ++it) {
 					mdclog_write(MDCLOG_DEBUG,"BINDING SUCCESS");
 						//print something here telling us wht happened
 
+					sprintf(url, "http://127.0.0.1:8000/v1/ues/%s", ue1imsi.c_str());
+
 				}
 				TOTAL_TX_1 = 0;
 				COUNTER1 = 0;
@@ -710,6 +716,8 @@ for (auto it = report->ues.begin(); it != report->ues.end(); ++it) {
 					mdclog_write(MDCLOG_DEBUG,"BINDING SUCCESS");
 
 					//print something here
+
+					sprintf(url, "http://127.0.0.1:8000/v1/ues/%s", ue2imsi.c_str());
 
 				}				
 				TOTAL_TX_2 = 0;
@@ -762,10 +770,47 @@ for (auto it = report->ues.begin(); it != report->ues.end(); ++it) {
 
 					//print something here
 
+					sprintf(url, "http://127.0.0.1:8000/v1/ues/%s", ue3imsi.c_str());
+
 				}				
 				TOTAL_TX_3 = 0;
 				COUNTER3 = 0;
 			}
+
+			mdclog_write(MDCLOG_INFO, "%s", url);
+			curl_global_init(CURL_GLOBAL_DEFAULT);
+			CURL *curl = curl_easy_init();
+			curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+			curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+			curl_easy_setopt(curl, CURLOPT_URL, url);
+			curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L); 
+			CURLcode ret = curl_easy_perform(curl);	
+			std::string readBuffer;
+
+			if(ret != CURLE_OK) {
+				std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(ret) << std::endl;
+			} else {
+				// Print the response body
+				std::cout << "Response body:\n" << readBuffer << std::endl;
+			}
+
+			mdclog_write(MDCLOG_DEBUG, "Deleted Ue");
+
+			curl_easy_setopt(curl, CURLOPT_URL, "http://127.0.0.1:8000/v1/slices/secure_slice");
+			ret = curl_easy_perform(curl);	
+
+			
+			if(ret != CURLE_OK) {
+				std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(ret) << std::endl;
+			} else {
+				// Print the response body
+				std::cout << "Response body:\n" << readBuffer << std::endl;
+			}
+
+			curl_easy_cleanup(curl);
+			curl_global_cleanup();
+			mdclog_write(MDCLOG_DEBUG, "Deleted Secure Slice");
+
 
 		}
 	}
