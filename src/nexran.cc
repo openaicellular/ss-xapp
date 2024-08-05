@@ -34,7 +34,7 @@ bool counterCondition; // Condition used if there is a third UE (COUNTER)
 bool maliciousUE = false;
 bool slicecheck=0;
 
-int tx_threshold = 130;
+int tx_threshold = 105;
 
 
 char url[1024];
