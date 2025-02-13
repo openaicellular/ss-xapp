@@ -11,8 +11,8 @@ ARG MDCLOG_VERSION=0.1.1-1
 ARG RMR_VERSION=4.4.6
 
 RUN apt-get update \
-  && apt-get install -y cmake g++ libssl-dev rapidjson-dev git \
-    ca-certificates curl gnupg apt-transport-https apt-utils \
+  && apt-get install -y cmake g++ libssl-dev rapidjson-dev git libboost-all-dev software-properties-common wget \
+    ca-certificates curl gnupg apt-transport-https apt-utils libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev \
     pkg-config autoconf libtool libcurl4-openssl-dev \
   && curl -s https://packagecloud.io/install/repositories/o-ran-sc/${ORAN_REPO}/script.deb.sh | os=debian dist=stretch bash  \
   && ( [ "${ORAN_VERSIONS}" = "latest" ] \
@@ -24,6 +24,18 @@ RUN apt-get update \
 	     rmr rmr-dev \
      ) \
   && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update \
+  && apt-get install -y build-essential zlib1g-dev libffi-dev libssl-dev libbz2-dev libsqlite3-dev libreadline-dev libncurses5-dev libgdbm-dev \
+  && wget https://www.python.org/ftp/python/3.8.18/Python-3.8.18.tgz \
+  && tar xvf Python-3.8.18.tgz \
+  && cd Python-3.8.18 \
+  && ./configure --enable-optimizations --enable-shared --with-system-ffi LDFLAGS="-Wl,-rpath=/usr/local/lib" \
+  && make \
+  && make altinstall \
+  && update-alternatives --install /usr/bin/python python /usr/local/bin/python3.8 1 \
+  && apt-get update \
+  && python3.8 -m pip install influxdb numpy tensorflow
 
 RUN cd /tmp \
   && git clone https://gitlab.flux.utah.edu/powderrenewpublic/xapp-frame-cpp \
@@ -70,16 +82,22 @@ RUN cd /nexran \
   && ( [ ! -e /nexran/lib/e2sm/messages/e2sm-kpm-v01.00.asn1 ] \
        && mkdir -p /nexran/lib/e2sm/messages/generated \
        && curl https://www.emulab.net/downloads/johnsond/profile-oai-oran/E2SM-KPM-ext-generated-bindings.tar.gz | tar -xzv -C /nexran/lib/e2sm/messages/generated \
+       && cp /nexran/E2SM_KPM_PerUEReportListItem.h /nexran/lib/e2sm/messages/generated/E2SM-KPM/E2SM_KPM_PerUEReportListItem.h \
+       && cp /nexran/E2SM_KPM_PerUEReportListItem.c /nexran/lib/e2sm/messages/generated/E2SM-KPM/E2SM_KPM_PerUEReportListItem.c \
        && echo "RIC_GENERATED_E2SM_KPM_BINDING_DIR:STRING=/nexran/lib/e2sm/messages/generated/E2SM-KPM" >> CMakeCache.txt ) \
      || true \
   && cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ../ \
-  && make install && ldconfig
+  && make install && ldconfig 
 
 ENV RMR_RTG_SVC="9999" \
     RMR_SEED_RT="/nexran/etc/routes.txt" \
     DEBUG=1 \
     XAPP_NAME="nexran" \
     XAPP_ID="1"
+
+ENV OMP_NUM_THREADS=1
+ENV TF_NUM_INTEROP_THREADS=1
+ENV TF_NUM_INTRAOP_THREADS=1
 
 CMD [ "/usr/local/bin/nexran" ]
 

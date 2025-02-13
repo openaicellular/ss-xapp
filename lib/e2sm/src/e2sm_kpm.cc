@@ -172,6 +172,7 @@ static KpmReport *decode_kpm_indication(
 			    report->ues[pui->rnti].ul_samples = pui->ul_samples;
 			    report->ues[pui->rnti].dl_mcs = pui->dl_mcs;
 			    report->ues[pui->rnti].dl_samples = pui->dl_samples;
+			    report->ues[pui->rnti].imsi = pui->imsi;
 			}
 		    }
 		    if (plmn_cell_item->du_PM_EPC->perSliceReportList) {
@@ -307,6 +308,7 @@ std::string KpmReport::to_string(char group_delim,char item_delim)
 	   << "ul_samples=" << it->second.ul_samples << item_delim
 	   << "dl_mcs=" << it->second.dl_mcs << item_delim
 	   << "dl_samples=" << it->second.dl_samples << item_delim
+	   << "imsi=" << it->second.imsi << item_delim
 	   << "}" << group_delim;
     for (auto it = slices.begin(); it != slices.end(); ++it)
 	ss << "slice[" << it->first << "]={"
