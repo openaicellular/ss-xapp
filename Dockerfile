@@ -11,7 +11,7 @@ ARG MDCLOG_VERSION=0.1.1-1
 ARG RMR_VERSION=4.4.6
 
 RUN apt-get update \
-  && apt-get install -y cmake g++ libssl-dev rapidjson-dev git libboost-all-dev software-properties-common wget \
+  && apt-get install -y cmake g++ libssl-dev rapidjson-dev git libboost-all-dev \
     ca-certificates curl gnupg apt-transport-https apt-utils libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev \
     pkg-config autoconf libtool libcurl4-openssl-dev \
   && curl -s https://packagecloud.io/install/repositories/o-ran-sc/${ORAN_REPO}/script.deb.sh | os=debian dist=stretch bash  \
@@ -26,16 +26,9 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update \
-  && apt-get install -y build-essential zlib1g-dev libffi-dev libssl-dev libbz2-dev libsqlite3-dev libreadline-dev libncurses5-dev libgdbm-dev \
-  && wget https://www.python.org/ftp/python/3.8.18/Python-3.8.18.tgz \
-  && tar xvf Python-3.8.18.tgz \
-  && cd Python-3.8.18 \
-  && ./configure --enable-optimizations --enable-shared --with-system-ffi LDFLAGS="-Wl,-rpath=/usr/local/lib" \
-  && make \
-  && make altinstall \
-  && update-alternatives --install /usr/bin/python python /usr/local/bin/python3.8 1 \
-  && apt-get update \
-  && python3.8 -m pip install influxdb numpy tensorflow
+  && apt-get install -y python3-dev python3-pip \
+  && python3 -m pip install influxdb numpy torch torchvision torchaudio datetime psutil \
+  && update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
 RUN cd /tmp \
   && git clone https://gitlab.flux.utah.edu/powderrenewpublic/xapp-frame-cpp \
@@ -94,10 +87,6 @@ ENV RMR_RTG_SVC="9999" \
     DEBUG=1 \
     XAPP_NAME="nexran" \
     XAPP_ID="1"
-
-ENV OMP_NUM_THREADS=1
-ENV TF_NUM_INTEROP_THREADS=1
-ENV TF_NUM_INTRAOP_THREADS=1
 
 CMD [ "/usr/local/bin/nexran" ]
 

@@ -1,4 +1,4 @@
-﻿#!/bin/sh
+﻿!/bin/sh
 
 SLEEPINT=5;
 
@@ -10,6 +10,10 @@ if [ -z "$SS_XAPP" ]; then
     echo "ERROR: failed to find ss-xapp nbi service; aborting!"
     exit 1
 fi
+
+kubectl exec ricplt-influxdb-meta-0 -n ricplt -- influx -database 'metrics' -execute 'DROP DATABASE Data_Collector'
+kubectl exec ricplt-influxdb-meta-0 -n ricplt -- influx -database 'metrics' -execute 'CREATE DATABASE Data_Collector'
+
 
 echo SS_XAPP=$SS_XAPP ; echo
 

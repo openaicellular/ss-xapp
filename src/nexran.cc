@@ -18,7 +18,7 @@
 #include "restserver.h"
 //#include "restserver.cc"
 
-#include <python3.8/Python.h>
+#include <Python.h>
 #include <unistd.h>
 #include <dirent.h>
 #include <cstring>
@@ -798,7 +798,6 @@ void App::start()
 		gstate = PyGILState_Ensure();
 
 		PyRun_SimpleString("import sys; sys.argv = ['']");
-		PyRun_SimpleString("print(f'Python version: {sys.version}',flush=True)");
 		PyRun_SimpleString("sys.path.append('/nexran/src/')");
 
 		PyObject *pName = PyUnicode_DecodeFSDefault("intrusionDetection");  // Module name you want to run
