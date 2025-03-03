@@ -13,13 +13,6 @@ from datetime import datetime, timedelta
 import gc
 import sys
 
-def trace_calls(frame, event, arg):
-    if event == "return":
-        print(f"Return value: {arg}")
-    return trace_calls
-
-sys.settrace(trace_calls)
-
 torch.set_num_threads(1)
 
 os.environ["OMP_NUM_THREADS"] = "1"
