@@ -135,7 +135,7 @@ Deploy Near-Realtime RIC
 Deploy the Near-Realtime RIC with the commands below
 
 .. code-block:: bash
-    cd ~/oaic/RIC-Deployment/RECIPe_EXAMPLE/PLATFORM/
+    cd ~/oaic/RIC-Deployment/RECIPE_EXAMPLE/PLATFORM/
     git checkout e_rel_xapp_onboarder_support
     cd ~/oaic/RIC-Deployment/bin
     sudo ./deploy-ric-platform -f ../RECIPE_EXAMPLE/PLATFORM/example_recipe_oran_e_release_modified_e2.yaml
@@ -172,11 +172,16 @@ Installing Asn1c compiler
 Install Srslte from source
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. note::
+
+   Checkout srslte-e2 to ss-xapp-support. This is where the code is updated for the kpm indication for the ss-xapp to work.
+
 .. code-block:: bash
 
     cd ~/oaic
     git clone https://github.com/openaicellular/srslte-e2
     cd srslte-e2
+    git checkout ss-xapp-support
     rm -rf build
     mkdir build
     export SRS=`realpath .`
